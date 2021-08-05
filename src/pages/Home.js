@@ -1,10 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, Image, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Input } from '../components/Input';
 import { styles } from '../styles/index';
+import api from '../services/Api';
 
-export function Home({ navigation }) {
+export function Home() {
+  const [matricula, setMatricula] = useState('');
+  const [password, setPassword] = useState('');
+
+  async function handleLogin() {
+    var params = new URLSearchParams();
+    params.append('username', matricula);
+    params.append('password', password);
+    try {
+      const response = await api.post('autenticacao/token/', params);
+      const { token } = response.data;
+
+      const responseUser = await api.get('minhas-informacoes/meus-dados/', {
+        headers: {
+          'authorization': 'jwt' + token,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log(responseUser.data);
+    } catch {
+      Alert.alert("Erro na autenticação.");
+    }
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -17,15 +43,15 @@ export function Home({ navigation }) {
           style={styles.logo}
         />
         <Text style={styles.textLogo}>
-          IFRN - Pau dos Ferros
+          IFRN.DO-PDF
         </Text>
       </View>
 
       <View style={styles.form}>
-        <Input style={styles.input} placeholder="Login" />
-        <Input style={styles.input} placeholder="Senha" />
+        <Input style={styles.input} placeholder="Matrícula" onChangeText={x => setMatricula(x)} />
+        <Input style={styles.input} placeholder="Senha" secureTextEntry={true} onChangeText={x => setPassword(x)} />
 
-        <TouchableOpacity style={styles.btn}>
+        <TouchableOpacity style={styles.btn} onPress={handleLogin}>
           <Text style={styles.textBtn}>
             Entrar
           </Text>

@@ -41,5 +41,22 @@ export const styles = StyleSheet.create({
     },
     input: {
         borderRadius: 20,
+    },
+    containerInput: {
+        width: 300,
+        height: 50,
+        backgroundColor: '#FFFFFF',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 5,
+    },
+    inputs: {
+        flex: 1,
+        height: '100%',
+        paddingLeft: 10,
+        color: '#B2B2B2',
+        fontSize: 17,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 5,
     }
 });
