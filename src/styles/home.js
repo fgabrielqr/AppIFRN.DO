@@ -36,6 +36,7 @@ export const styles = StyleSheet.create({
         paddingLeft: 20,
         color: 'gray',
         fontSize: 17,
+        borderRadius: 5,
 
     },
     button: {
@@ -59,15 +60,16 @@ export const styles = StyleSheet.create({
         borderRadius: 5,
     },
     tarefa: {
-        fontSize: 17,
+        fontSize: 18,
+        marginRight: 175,
     },
 
     button_index: {
         padding: 10,
-        marginRight: 15
+        marginRight: 10
     },
     checkbox: {
-        marginLeft: 30,
+        marginLeft: 20,
         marginRight: 2
     }
 });
