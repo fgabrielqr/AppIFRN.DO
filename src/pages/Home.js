@@ -1,62 +1,77 @@
-import React, { useState } from 'react';
-import { Text, View, Image, TouchableOpacity, Alert } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { Input } from '../components/Input';
-import { styles } from '../styles/index';
-import api from '../services/Api';
+import React, { useState, useEffect } from 'react'
+import { Keyboard, FlatList, StatusBar } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import { Index } from '../components/Index'
+import { styles } from '../styles/home';
 
-export function Home() {
-  const [matricula, setMatricula] = useState('');
-  const [password, setPassword] = useState('');
+export default function Home() {
+    const keyAsyncStorage = "@blocoNotas:tarefas";
+    const [task, setTask] = useState("")
+    const [tasks, setTasks] = useState([])
 
-  async function handleLogin() {
-    var params = new URLSearchParams();
-    params.append('username', matricula);
-    params.append('password', password);
-    try {
-      const response = await api.post('autenticacao/token/', params);
-      const { token } = response.data;
-
-      const responseUser = await api.get('minhas-informacoes/meus-dados/', {
-        headers: {
-          'authorization': 'jwt' + token,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+    async function saveTasks() {
+        const data = {
+            id: String(new Date().getTime()),
+            name: task
         }
-      });
 
-      console.log(responseUser.data);
-    } catch {
-      Alert.alert("Erro na autenticação.");
+        setTasks(oldValue => [...oldValue, data]);
+        const vetData = [...tasks, data];
+        try {
+            await AsyncStorage.setItem(keyAsyncStorage, JSON.stringify(vetData));
+        } catch (error) {
+            Alert.alert("erro na gravação de dados");
+        }
+        Alert.alert("tarefa adicionada");
+        setTask("");
     }
-  }
 
-  return (
-    <View style={styles.container}>
-      <StatusBar
-        animated={true}
-        backgroundColor="#1DB863" />
+    async function deleteTask(id) {
+        const data = tasks.filter(item => item.id != id)
+        await AsyncStorage.setItem(keyAsyncStorage, JSON.stringify(data))
+        setTasks(data)
+    }
 
-      <View style={styles.imgLogo}>
-        <Image
-          source={require('../img/logo.png')}
-          style={styles.logo}
-        />
-        <Text style={styles.textLogo}>
-          IFRN.DO-PDF
-        </Text>
-      </View>
+    async function loadTasks() {
+        try {
+            const retorno = await AsyncStorage.getItem(keyAsyncStorage);
+            const dados = JSON.parse(retorno);
 
-      <View style={styles.form}>
-        <Input style={styles.input} placeholder="Matrícula" onChangeText={x => setMatricula(x)} />
-        <Input style={styles.input} placeholder="Senha" secureTextEntry={true} onChangeText={x => setPassword(x)} />
+            setTasks(dados || []);
+        } catch (error) {
+            Alert.alert("erro no carregamento dos dados");
+        }
+    }
 
-        <TouchableOpacity style={styles.btn} onPress={handleLogin}>
-          <Text style={styles.textBtn}>
-            Entrar
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    useEffect(() => {
+        loadTasks();
+    }, []);
+
+    return (
+        <View style={styles.container}>
+            <StatusBar backgroundColor="#1DB863" />
+            <View style={styles.container_header}>
+                <Text style={[styles.text, styles.text_title]}>IFRN.DO</Text>
+                <Text style={[styles.text, { fontSize: 15 }]}>Você tem <Text style={{ fontWeight: 'bold' }}>{tasks.length} tarefas</Text></Text>
+            </View>
+
+            <View style={styles.container_input}>
+                <TextInput style={styles.inputText} placeholder='Adicione uma tarefa' onChangeText={setTask} value={task} />
+                <TouchableOpacity style={styles.button} onPress={() => saveTasks()} onPressIn={Keyboard.dismiss}>
+                    <AntDesign name="right" size={20} color={'gray'} />
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.list_tarefas}>
+                <FlatList data={tasks}
+                    keyExtractor={item => item.id}
+                    renderItem={({ item }) => (
+                        <Index name={item.name} apagar={() => deleteTask(item.id)} />
+                    )}
+                />
+            </View>
+        </View>
+    )
 }

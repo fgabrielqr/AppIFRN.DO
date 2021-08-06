@@ -1,14 +1,16 @@
 import React from 'react';
 import { View, TextInput } from 'react-native';
-import { styles } from '../styles/index';
+import { styles } from '../styles/login';
 
-export function Input({ placeholder }) {
+export function Input(props) {
 
     return (
         <View style={styles.containerInput}>
             <TextInput
                 style={styles.inputs}
-                placeholder={placeholder} />
+                placeholder={props.label}
+                secureTextEntry={props.password}
+                onChangeText={props.onChangeText} />
         </View>
     )
 }

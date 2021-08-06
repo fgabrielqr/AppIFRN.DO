@@ -43,8 +43,9 @@ export const styles = StyleSheet.create({
         borderRadius: 20,
     },
     containerInput: {
-        width: 300,
-        height: 50,
+        marginTop: 15,
+        width: '80%',
+        height: 60,
         backgroundColor: '#FFFFFF',
         flexDirection: 'row',
         alignItems: 'center',
@@ -53,10 +54,11 @@ export const styles = StyleSheet.create({
     inputs: {
         flex: 1,
         height: '100%',
-        paddingLeft: 10,
-        color: '#B2B2B2',
-        fontSize: 17,
+        padding: 10,
         backgroundColor: '#FFFFFF',
+        paddingLeft: 20,
+        color: 'gray',
         borderRadius: 5,
+        fontSize: 17,
     }
 });
